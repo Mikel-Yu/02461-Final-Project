@@ -1,7 +1,9 @@
 # 02461-Final-Project
 Image Recognition with YOLOv8
 
+
 Proposals:
+
 Recognition of brain tumors
 
 Recognition of plastic bottles
