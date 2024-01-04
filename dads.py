@@ -27,12 +27,14 @@ classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "trai
 frame_counter = 0
 a = []
 me = 10
+
+different = False
 while True:
     success, img = cap.read()
-    
+    print(different)
     frame_counter += 1
     
-    if frame_counter % 30 == 0: # Analyze every x'th frame
+    if frame_counter % 120 == 0: # Analyze every x'th frame
         results = model(img, stream=True)
 
         # coordinates
@@ -75,9 +77,12 @@ while True:
 
                 a.append([x1, y1, x2, y2,cls])
     
-
-        for i in len(a):
-            for c in len(b):
+        
+        for i in range(len(a)):
+            if different == True:
+                break
+            different == True
+            for c in range(len(b)):
                 if abs(a[i][0] - b[c][0]) > me:
                     None
                 elif abs(a[i][1] - b[c][1]) > me:
@@ -87,7 +92,7 @@ while True:
                 elif abs(a[i][3] - b[c][3]) > me:
                     None
                 else:
-                    diffrent = False
+                    different = False
     cv2.imshow('Webcam', img)
     if cv2.waitKey(1) == ord('q'):
         break
