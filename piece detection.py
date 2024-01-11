@@ -9,11 +9,11 @@ cap.set(4, 480)
 
 # model
 model_corners = YOLO("indsæt model for corners")
-model_pieces = YOLO("indsæt model for brækkerne")
+model_pieces = YOLO("indsæt model for brikkerne")
 # object classes
 classNames = []
 
-#funktioner
+#functions
 def position_check(a,b):
     for i in range(len(a)):
         different = True
@@ -191,8 +191,8 @@ while True:
                 pieces.append([x1, y1, x2, y2,cls])
             for i in range(len(a)):
                 pieces[i] = [(pieces[i][0]+pieces[i][2])/2,pieces[i][3],pieces[i][-1]] 
-        diffrent = position_check(pieces,pieces_old)
-        if diffrent == True:
+        different = position_check(pieces,pieces_old)
+        if different == True:
             position_assigmnet(pieces):
     cv2.imshow('Webcam', img) 
 
