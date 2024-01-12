@@ -159,14 +159,17 @@ def connect_square_to_detection(detections, square):
     
     max_iou_index = list_of_iou.index(max(list_of_iou))
     max_iou_value = max(list_of_iou)
+    
+    num = max_iou_index
 
-    if max_iou_value > 0.15:
-        class_label = int(detections[max_iou_index][4])
-        piece = di.get(class_label, "Unknown")
+    piece = boxes.cls[num].tolist()
+
+    if max_iou_value > 0.10:
+        piece = boxes.cls[num].tolist()
+        return di.get(piece, "empty")
     else:
-        piece = "empty"
+        return "empty"
 
-    return piece
 
 
 def create_fen(detections, all_squares):
@@ -205,17 +208,16 @@ def generate_squares(transformed_image):
     if not isinstance(transformed_image, np.ndarray):
         transformed_image = np.asarray(transformed_image)
         
-    # square_size = transformed_image.shape[0] / 8 
-    square_size = 640 * 640
+    square_size = (transformed_image.shape[1] / 8, transformed_image.shape[0] / 8)
     all_squares = []
 
     for row in range(8):
         rank = []
         for col in range(8):
-            top_left = (col * square_size, row * square_size)
-            top_right = ((col + 1) * square_size, row * square_size)
-            bottom_left = (col * square_size, (row + 1) * square_size)
-            bottom_right = ((col + 1) * square_size, (row + 1) * square_size)
+            top_left = (col * square_size[0], row * square_size[1])
+            top_right = ((col + 1) * square_size[0], row * square_size[1])
+            bottom_left = (col * square_size[0], (row + 1) * square_size[1])
+            bottom_right = ((col + 1) * square_size[0], (row + 1) * square_size[1])
             square = [top_left, top_right, bottom_right, bottom_left]
             rank.append(square)
         all_squares.append(rank)
@@ -223,7 +225,9 @@ def generate_squares(transformed_image):
     
     for rank in all_squares:
         for square in rank:
-            cv2.polylines(transformed_image, [np.array(square, np.int32)], True, (0, 255, 0), 3)
+            square_np = np.array(square, dtype = np.int32)
+            cv2.polylines(transformed_image, [square_np], True, (0, 255, 0), 3)
+            
     Image.fromarray(transformed_image).save("squares_on_transformed_image.jpg")
 
 
@@ -240,7 +244,7 @@ def generate_board(detections, all_squares):
 
 
 
-image = '/Users/mikelyu/Desktop/Uni/02461 Intelligente Systemer/Final_Project/Dataset/WIN_20240109_14_01_42_Pro.jpg'
+image = '/Users/mikelyu/Desktop/Uni/02461 Intelligente Systemer/Final_Project/Dataset/WIN_20240109_14_25_02_Pro.jpg'
 corners = detect_corners(image)
 
 transformed_image = four_point_transform(image, corners)
@@ -250,6 +254,7 @@ ptsT, ptsL = grid_on_chessboard(transformed_image)
 detections, boxes = chess_pieces_detector(transformed_image)
 
 all_squares = generate_squares(transformed_image)
+# all_squares = grid_on_chessboard(transformed_image)
 board = generate_board(detections, all_squares)
 
 print(board)
