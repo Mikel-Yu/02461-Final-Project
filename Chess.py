@@ -1,6 +1,9 @@
 from ultralytics import YOLO
 import cv2
 
+import tkinter as tk
+from threading import Thread
+
 from matplotlib import figure
 import matplotlib.image as image
 from matplotlib import pyplot as plt
@@ -240,11 +243,41 @@ def generate_board(detections, all_squares):
     return board
     
 
+def capture_image():
+    cap = cv2.VideoCapture(0)
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Failed to grab frame")
+            break
+        cv2.imshow("Webcam - Press 's' to Save and Exit", frame)
+
+        k = cv2.waitKey(1)
+        if k % 256 == 115:  # Press 's' to save the image and exit
+            img_name = "captured_chessboard.jpg"
+            cv2.imwrite(img_name, frame)
+            print(f"{img_name} saved!")
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+    return img_name
+
+def start_capture():
+    Thread(target=capture_image).start()
 
 
 
+# GUI to trigger webcam capture
+root = tk.Tk()
+button = tk.Button(root, text="Capture Chessboard Image", command=start_capture)
+button.pack()
+root.mainloop()
 
-image = '/Users/mikelyu/Desktop/Uni/02461 Intelligente Systemer/Final_Project/Dataset/WIN_20240109_14_25_02_Pro.jpg'
+
+# image = '/Users/mikelyu/Desktop/Uni/02461 Intelligente Systemer/Final_Project/Dataset/WIN_20240109_14_24_57_Pro.jpg'
+image = "captured_chessboard.jpg"
 corners = detect_corners(image)
 
 transformed_image = four_point_transform(image, corners)
@@ -254,7 +287,6 @@ ptsT, ptsL = grid_on_chessboard(transformed_image)
 detections, boxes = chess_pieces_detector(transformed_image)
 
 all_squares = generate_squares(transformed_image)
-# all_squares = grid_on_chessboard(transformed_image)
 board = generate_board(detections, all_squares)
 
 print(board)
