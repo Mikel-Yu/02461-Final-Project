@@ -53,6 +53,7 @@ def detect_corners(image):
     return corners   
 
 
+
 def four_point_transform(image, pts):
     img = Image.open(image)
     image = asarray(img)
